@@ -47,6 +47,7 @@ class User(AbstractUser):
     invited_by = models.ForeignKey(
         "self",
         related_name="invited_users",
+        verbose_name="пользователь приглашен",
         on_delete=models.SET_NULL,
         null=True,
         blank=True
