@@ -4,7 +4,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +22,6 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv('DEBUG', True)
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -83,7 +81,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DATABASE_NAME', 'refsys_db'),
-        'USER': os.getenv('DATABASE_USER', 'refsys_db_username'),
+        'USER': os.getenv('DATABASE_USER', 'refsys_db_user'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'refsys_db_password'),
         'HOST': os.getenv('DATABASE_HOST', 'localhost'),
         'PORT': os.getenv('DATABASE_PORT', 5432),
@@ -196,3 +194,7 @@ SPECTACULAR_SETTINGS = {
     'REDOC_DIST': 'SIDECAR',
 
 }
+
+# Users
+
+AUTH_USER_MODEL = 'users.User'
