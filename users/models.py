@@ -3,16 +3,14 @@ import string
 
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from users.validators import (LettersDigitsValidator, OnlyDigitsValidator,
+                              PhoneValidator)
+
 
 class User(AbstractUser):
-    phone_validator = RegexValidator(
-        regex=r'^\+\d{10,15}$',
-        message="Введите номер телефона до 15 цифр в формате: '+1234567890"
-    )
     username = models.CharField(
         _("username"),
         max_length=150,
@@ -29,17 +27,19 @@ class User(AbstractUser):
     )
     phone = models.CharField(
         "номер телефона",
-        validators=[phone_validator],
+        validators=[PhoneValidator()],
         max_length=16,
         unique=True
     )
-    authorization_code = models.CharField(
-        "код авторизации",
+    authentication_code = models.CharField(
+        "код аутентификации",
+        validators=[OnlyDigitsValidator()],
         max_length=4,
         blank=True
     )
     invite_code = models.CharField(
         "инвайт-код",
+        validators=[LettersDigitsValidator],
         max_length=6,
         editable=False,
         blank=True
