@@ -1,7 +1,8 @@
 from django.contrib import admin
-from users.models import User
 from django.urls import reverse
 from django.utils.html import format_html
+
+from users.models import User
 
 
 @admin.register(User)

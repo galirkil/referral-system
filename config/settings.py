@@ -185,8 +185,8 @@ SIMPLE_JWT = {
 # DRF Spectacular
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Simple referral system API',
-    'DESCRIPTION': 'Your project description',
+    'TITLE': 'Простая реферальная система',
+    'DESCRIPTION': '',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_DIST': 'SIDECAR',
