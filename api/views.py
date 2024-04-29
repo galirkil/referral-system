@@ -2,29 +2,30 @@ import time
 
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import status, views
+from rest_framework import mixins, status, views, viewsets
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import viewsets, mixins
+from rest_framework_simplejwt.views import TokenRefreshView
 
-from api.serializers import (InviteCodeSerializer,
-                             AuthenticationCodeSerializer,
-                             PhoneSerializer, UserProfileSerializer)
+from api.permissions import IsOwnerOrAdmin
+from api.serializers import (AuthenticationCodeSerializer,
+                             InviteCodeSerializer, PhoneSerializer,
+                             UserProfileSerializer)
 from api.utils import generate_authentication_code
 from users.models import User
-from api.permissions import IsOwnerOrAdmin
 
 
 class RequestAuthCodeView(views.APIView):
     """
-    Принимает номер телефона в формате: '+123456789',
-    отправляет код аутентификации на указанный номер.
-    Приложение в тестовом режиме,
-    код аутентификации будет возращен в теле ответа.
+    Принимает номер телефона в формате: '+123456789', отправляет код
+    аутентификации на указанный номер.
+
+    Приложение в тестовом режиме, код аутентификации будет возращен
+    в теле ответа.
     """
 
     @extend_schema(
@@ -87,10 +88,9 @@ class ObtainTokensView(views.APIView):
 
 class ActivateInviteCodeView(views.APIView):
     """
-    Принимает инвайт-код код для активации.
-    Код можно активировать один раз.
-    Эндпоинт доступен из профиля пользователя,
-    если ранее пользователь не активировал код.
+    Принимает инвайт-код код для активации. Код можно активировать один раз.
+    Эндпоинт доступен из профиля пользователя, если ранее пользователь
+    не активировал код.
     """
     permission_classes = (IsAuthenticated,)
 
@@ -112,16 +112,13 @@ class ActivateInviteCodeView(views.APIView):
 
 @extend_schema_view(
     retrieve=extend_schema(summary='Получить информацию о пользователе'),
-    update=extend_schema(
-        summary='Обновить информацию о пользователе (все обязательные поля)'),
-    partial_update=extend_schema(
-        summary='Обновить произвольные поля модели пользователя')
+    partial_update=extend_schema(summary='Обновить информацию о пользователе')
 )
 class UserRetrieveUpdateViewSet(mixins.UpdateModelMixin,
                                 mixins.RetrieveModelMixin,
                                 viewsets.GenericViewSet):
     """
-    Возвращает, обновляет информацию о пользователе в зависимости от
+    Возвращает/обновляет информацию о пользователе в зависимости от
     метода запроса.
 
     Если пользователь ранее активировал инвайт-код ответ будет содержать
@@ -132,3 +129,13 @@ class UserRetrieveUpdateViewSet(mixins.UpdateModelMixin,
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     lookup_field = 'phone'
+    http_method_names = ["get", "patch"]
+
+
+@extend_schema(summary="Обновить access-токен")
+class CustomRefreshTokenView(TokenRefreshView):
+    """
+    Принимает refresh-токен и возращает access-токен, если refresh-токен
+    действителен.
+    """
+    pass
